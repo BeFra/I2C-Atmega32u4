@@ -20,7 +20,7 @@ void init_i2c() {
 
 
 /*
- * Sends the start condition
+ * send the start condition
  * adr: address of the hardware
  * w: read or write flag
  */
@@ -31,7 +31,7 @@ void connect_i2c(uint8_t adr, uint8_t w) {
 
 }
 /*
- * Sends the start condition
+ * send the start condition
  */
 void start_i2c() {
 
