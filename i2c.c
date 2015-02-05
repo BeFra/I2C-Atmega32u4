@@ -6,21 +6,21 @@
 #include <util/twi.h>
 #include "header/config_defines.h"
 #include "header/i2c.h"
+#include "header/print.h"
 /*
  * Initialization of the I2C bus
  */
 void init_i2c() {
 	PORTD &= ~(1 << 0);
 	PORTD &= ~(1 << 1);
-	// TODO Port fÃ¼r SCL und SDA
+	// TODO Port für SCL und SDA
 	TWBR = ((( F_CPU / SCL_CLOCK ) - 16) / 2); 
 	TWSR = 0; 
 	TWCR = ( 1 << TWEN ); // enable the i2c bus 
 }
 
-
 /*
- * send the start condition
+ * Sends the start condition
  * adr: address of the hardware
  * w: read or write flag
  */
@@ -28,38 +28,40 @@ void connect_i2c(uint8_t adr, uint8_t w) {
 
 	start_i2c();
 	send_address_i2c(adr,w);
-
 }
+
 /*
- * send the start condition
+ * Sends the start condition
  */
 void start_i2c() {
-
+	uint8_t   twstatus;
 	// send START condition
 	TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN);
 	
 	// wait until transmission completed
 	while ( !(TWCR & (1<<TWINT)))	;
-	
-	if ((TWSR & 0xF8) != TW_START){
+	twstatus = TW_STATUS & 0xF8;
+	if ((twstatus != TW_START) && (twstatus != TW_REP_START)){
 		#ifdef DEBUG
 		print("\n   |Error: Start -> ");
 		phex(TWSR & 0xF8);
 		#endif
 	}
 }
+
 /*
+ * 
  * adr: address of the hardware
  * w: read or write flag
  */
 void send_address_i2c(uint8_t adr, uint8_t w) {
-	
+	uint8_t   twstatus;
 	TWDR = (adr<<1) | w ;
 	TWCR = (1 << TWINT) | (1<<TWEN);
 	
 	while(!(TWCR & (1 << TWINT)));
-	
-	if ((TWSR & 0xF8) != TW_MT_SLA_ACK){
+	twstatus = TW_STATUS & 0xF8;
+	if ( (twstatus != TW_MT_SLA_ACK) && (twstatus != TW_MR_SLA_ACK) ) {
 		#ifdef DEBUG
 		print("\n   |Error: ADRESS -> ");
 		phex(TWSR & 0xF8);
@@ -74,20 +76,21 @@ void stop_i2c() {
 	TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
 	while(TWCR & (1 << TWSTO));
 }
+
 /*
  * sends one byte to the I2C hardware
  * data: byte to send
  */
 void send_i2c(uint8_t data) {
-
+	uint8_t   twstatus;
 	// send data to the previously addressed device
 	TWDR = data;
 	TWCR = (1 << TWINT) | (1<<TWEN);
 	
 	// wait until transmission completed
 	while(!(TWCR & (1 << TWINT)));
-	
-	if ((TW_STATUS & 0xF8) != TW_MT_DATA_ACK){
+	twstatus = TW_STATUS & 0xF8;
+	if( twstatus != TW_MT_DATA_ACK){
 		
 		#ifdef DEBUG
 		print("\n   |Error: Data -> ");
@@ -95,13 +98,22 @@ void send_i2c(uint8_t data) {
 		phex(TW_MT_DATA_ACK);
 		#endif
 	}
-
 }
+
 /*
- * recive one byte of the I2C hardware
+ * receive one byte of the I2C hardware, followed by a stop condition
  */
-uint8_t receive_i2c() {
-	TWCR = (1 << TWINT) | (1 << TWEN);// | (1<<TWEA);
+uint8_t read_i2c() {
+	TWCR = (1 << TWINT) | (1 << TWEN);
+	while(!(TWCR & (1 << TWINT)));
+	return TWDR;
+}
+
+/*
+ * receive one byte of the I2C hardware, request more data from hardware
+ */
+uint8_t readAck_i2c() {
+	TWCR = (1 << TWINT) | (1 << TWEN) | (1<<TWEA);
 	while(!(TWCR & (1 << TWINT)));
 	return TWDR;
 }
