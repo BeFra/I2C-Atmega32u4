@@ -16,7 +16,7 @@ void init_i2c() {
 	// TODO Port für SCL und SDA
 	TWBR = ((( F_CPU / SCL_CLOCK ) - 16) / 2); 
 	TWSR = 0; 
-	TWCR = ( 1 << TWEN ); // enable the i2c bus 
+	TWCR = ( 1 << TWEN ); // enable the i2c bus f
 }
 
 /*
@@ -103,7 +103,7 @@ void send_i2c(uint8_t data) {
 /*
  * receive one byte of the I2C hardware, followed by a stop condition
  */
-uint8_t read_i2c() {
+int8_t read_i2c() {
 	TWCR = (1 << TWINT) | (1 << TWEN);
 	while(!(TWCR & (1 << TWINT)));
 	return TWDR;
@@ -112,7 +112,7 @@ uint8_t read_i2c() {
 /*
  * receive one byte of the I2C hardware, request more data from hardware
  */
-uint8_t readAck_i2c() {
+int8_t readAck_i2c() {
 	TWCR = (1 << TWINT) | (1 << TWEN) | (1<<TWEA);
 	while(!(TWCR & (1 << TWINT)));
 	return TWDR;

@@ -9,8 +9,6 @@
 #ifndef CONFIG_DEFINES_H_
 #define CONFIG_DEFINES_H_
 
-#define DEBUG
-
 #define SCL_CLOCK 400000L
 
 #ifndef F_CPU
