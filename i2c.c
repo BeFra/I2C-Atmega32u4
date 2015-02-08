@@ -6,7 +6,7 @@
 #include <util/twi.h>
 #include "header/config_defines.h"
 #include "header/i2c.h"
-#include "header/print.h"
+#include "utils/print.h"
 /*
  * Initialization of the I2C bus
  */
