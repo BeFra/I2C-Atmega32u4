@@ -11,9 +11,8 @@
  * Initialization of the I2C bus
  */
 void init_i2c() {
-	PORTD &= ~(1 << 0);
-	PORTD &= ~(1 << 1);
-	// TODO Port für SCL und SDA
+	PORTD &= ~(1 << 0); //Port D0 SCL
+	PORTD &= ~(1 << 1); //Port D1 SDA
 	TWBR = ((( F_CPU / SCL_CLOCK ) - 16) / 2); 
 	TWSR = 0; 
 	TWCR = ( 1 << TWEN ); // enable the i2c bus f
