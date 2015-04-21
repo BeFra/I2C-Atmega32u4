@@ -4,9 +4,9 @@
  * Author: Benjamin Frank
  */ 
 #include <util/twi.h>
-#include "header/config_defines.h"
-#include "header/i2c.h"
-#include "utils/print.h"
+#include "../config_defines.h"
+#include "i2c.h"
+#include "../utils/print.h"
 /*
  * Initialization of the I2C bus
  */
